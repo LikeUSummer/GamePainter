@@ -1,2 +1,0 @@
-scriptPath="GameLive"
-resPath="GameRes"

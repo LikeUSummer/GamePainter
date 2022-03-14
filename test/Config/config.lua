@@ -1,0 +1,2 @@
+scriptPath = "GameLive"
+resPath = "GameRes"
