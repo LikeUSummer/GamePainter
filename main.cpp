@@ -1,3 +1,5 @@
+// 东方盛夏 2022
+// https://www.zhihu.com/people/da-xia-tian-60
 #include <cmath>
 #include <fstream>
 #include <functional>
@@ -18,9 +20,6 @@ LuaMachine g_luaMachine;
 std::map<uint32_t, std::unique_ptr<Gdiplus::Image>> g_imageMap;
 std::unique_ptr<Gdiplus::Font> g_font;
 std::unique_ptr<Gdiplus::Pen> g_pen;
-#ifdef GLOBAL_BRUSH
-std::unique_ptr<Gdiplus::SolidBrush> g_brush;
-#endif
 HCURSOR g_cursor;
 constexpr int GAME_LOOP_TIMER_ID = 960103;
 constexpr int GAME_LOOP_TIMER_PERIOD = 100; // ms
@@ -34,9 +33,6 @@ struct Initialiser {
         GdiplusStartup(&g_GDIPlusToken,&g_GDIStartupInput, NULL);
 
         g_pen = std::make_unique<Gdiplus::Pen>(Gdiplus::Color::Black, 1);
-#ifdef GLOBAL_BRUSH
-        g_brush = std::make_unique<Gdiplus::SolidBrush>(Gdiplus::Color::Red);
-#endif
         Gdiplus::FontFamily fontFamily(_T("宋体"));
         g_font = std::make_unique<Gdiplus::Font>(&fontFamily, 11);
     }
@@ -264,16 +260,6 @@ int SetPen(lua_State* L)
     return 0;
 }
 
-#ifdef GLOBAL_BRUSH
-int SetBrush(lua_State* L)
-{
-    COLORREF ARGB = lua_tointeger(L, 1);
-    Gdiplus::Color color(ARGB);
-    g_brush->SetColor(color);
-    return 0;
-}
-#endif
-
 int SetFont(lua_State* L)
 {
     std::string fontName = luaL_checkstring(L, 1);
@@ -358,9 +344,6 @@ const luaL_Reg g_gameLib[] = {
     {"DrawString", DrawString},
 
     {"SetPen", SetPen},
-#ifdef GLOBAL_BRUSH
-    {"SetBrush", SetBrush},
-#endif
     {"SetFont", SetFont},
     {"SetCursor", SetCursor},
     {"SetIMEPosition", SetIMEPosition},

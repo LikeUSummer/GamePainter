@@ -1,3 +1,5 @@
+// 东方盛夏 2022
+// https://www.zhihu.com/people/da-xia-tian-60
 #ifndef LUA_MACHINE_H
 #define LUA_MACHINE_H
 

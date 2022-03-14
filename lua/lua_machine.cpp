@@ -1,3 +1,5 @@
+// 东方盛夏 2022
+// https://www.zhihu.com/people/da-xia-tian-60
 #include "lua_machine.h"
 
 #include <fstream>

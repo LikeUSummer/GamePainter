@@ -1,3 +1,5 @@
+// 东方盛夏 2022
+// https://www.zhihu.com/people/da-xia-tian-60
 #ifndef WINDOW_H
 #define WINDOW_H
 
@@ -99,8 +101,7 @@ bool Window::Create()
     return CreateFromClassName(defaultWindowClassName_);
 }
 
-// 若需要使用系统控件，可传入系统预设窗口类名
-bool Window::CreateFromClassName(const std::wstring& className)
+bool Window::CreateFromClassName(const std::wstring& className) // 若需要使用系统控件，可传入系统预设窗口类名
 {
     if (windowMap_.count(handle_)) {
         Remove();
@@ -116,7 +117,7 @@ bool Window::CreateFromClassName(const std::wstring& className)
     ); // CreateWindow 执行过程中就要发送和处理完 WM_CREATE 消息，这样本框架就不能正常处理它
 
     windowMap_.insert({handle_, shared_from_this()});
-    SendMessage(handle_, WM_CREATE, 0 , 0); // 因此我们在窗口表初始化后，重发一次 WM_CREATE 消息 
+    SendMessage(handle_, WM_CREATE, 0 , 0); // 因此我们在窗口表初始化后，重发一次 WM_CREATE 消息，此时请忽略消息参数
     return true;
 }
 
