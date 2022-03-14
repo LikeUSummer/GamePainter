@@ -10,7 +10,7 @@ function Map:New(imagePath, x, y, w, h)
     obj.imageID = Painter.AddImage(imagePath)
     obj.width = w
     obj.height = h
-    obj.speed = 6
+    obj.speed = 10
     obj.haveMask = 0 -- 有无遮罩
     obj.maskID = -1 -- 遮罩图ID
     setmetatable(obj, self) -- 新建对象
