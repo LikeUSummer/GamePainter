@@ -11,7 +11,7 @@
 
 #include "win.h"
 #include "lua/lua_machine.h"
-#include "utils/include/codec.h"
+#include "utils/codec.h"
 
 #include <gdiplus.h>
 
@@ -32,9 +32,9 @@ struct Initialiser {
         Gdiplus::GdiplusStartupInput g_GDIStartupInput;
         GdiplusStartup(&g_GDIPlusToken,&g_GDIStartupInput, NULL);
 
-        g_pen = std::make_unique<Gdiplus::Pen>(Gdiplus::Color::Black, 1);
+        g_pen = std::make_unique<Gdiplus::Pen>(Gdiplus::Color::Black, 1.5f);
         Gdiplus::FontFamily fontFamily(_T("宋体"));
-        g_font = std::make_unique<Gdiplus::Font>(&fontFamily, 11);
+        g_font = std::make_unique<Gdiplus::Font>(&fontFamily, 11.f);
     }
 };
 Initialiser g_initialiser;
@@ -263,7 +263,7 @@ int SetPen(lua_State* L)
 int SetFont(lua_State* L)
 {
     std::string fontName = luaL_checkstring(L, 1);
-    int fontSize = lua_tointeger(L, 2);
+    float fontSize = lua_tonumber(L, 2);
 
     Gdiplus::FontFamily fontFamily(UTF8ToWide(fontName).c_str());
     g_font = std::make_unique<Gdiplus::Font>(&fontFamily, fontSize);

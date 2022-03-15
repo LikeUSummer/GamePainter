@@ -1,0 +1,57 @@
+import("//config.gni")
+
+c_files = [
+    "lapi.c",
+    "lauxlib.c",
+    "lbaselib.c",
+    "lbitlib.c",
+    "lcode.c",
+    "lcorolib.c",
+    "lctype.c",
+    "ldblib.c",
+    "ldebug.c",
+    "ldo.c",
+    "ldump.c",
+    "lfunc.c",
+    "lgc.c",
+    "linit.c",
+    "liolib.c",
+    "llex.c",
+    "lmathlib.c",
+    "lmem.c",
+    "loadlib.c",
+    "lobject.c",
+    "lopcodes.c",
+    "loslib.c",
+    "lparser.c",
+    "lstate.c",
+    "lstring.c",
+    "lstrlib.c",
+    "ltable.c",
+    "ltablib.c",
+    "ltm.c",
+    "lundump.c",
+    "lutf8lib.c",
+    "lvm.c",
+    "lzio.c",
+]
+
+config("lua_config") {
+    include_dirs = [ "./" ]
+    defines = [ "LUA_COMPAT_MODULE" ]
+}
+
+source_set("lua") {
+    public_configs = [ ":lua_config" ]
+    sources = c_files
+}
+
+static_library("lua_static") {
+    public_configs = [ ":lua_config" ]
+    sources = c_files
+}
+
+#copy("lua_static") {
+#   sources = [ "$root_out_dir/lua_static.lib" ]
+#    outputs = [ "//src/lua/bin/lua_static.lib" ]
+#}

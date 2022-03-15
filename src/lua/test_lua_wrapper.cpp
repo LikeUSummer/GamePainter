@@ -1,13 +1,14 @@
 // 东方盛夏 2022
 // https://www.zhihu.com/people/da-xia-tian-60
 #include "lua_machine.h"
-#include "../utils/include/codec.h"
 
 #include <string>
 #include <sstream>
 #include <iostream>
 #include <map>
 #include <vector>
+
+#include <codec.h>
 
 const std::string g_luaScript = R"(
     stringValue = nil
@@ -94,5 +95,6 @@ int main()
     wss << "Chinese: " << UTF8ToWide(text) << std::endl;
 
     std::wcout << wss.str();
+    getchar();
     return 0;
 }

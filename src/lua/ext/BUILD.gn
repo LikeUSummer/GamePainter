@@ -1,0 +1,11 @@
+import("//config.gni")
+
+source_set("utf8_source") {
+    sources = [ "utf8.c" ]
+    public_deps = [ "../src:lua" ]
+}
+
+shared_library("utf8plus") {
+    sources = [ "utf8.c" ]
+    public_deps = [ "../src:lua" ]
+}

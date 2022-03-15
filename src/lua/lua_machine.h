@@ -3,7 +3,9 @@
 #ifndef LUA_MACHINE_H
 #define LUA_MACHINE_H
 
+#ifndef LUA_COMPAT_MODULE
 #define LUA_COMPAT_MODULE
+#endif
 extern "C" {
 #include "src/lua.h" 
 #include "src/lualib.h" 

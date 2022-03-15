@@ -1,9 +1,12 @@
-/* vim: set ft=c nu et sw=2 fdc=2 fdm=syntax : */
-extern "C" {
-#include "../src/lua.h"
-#include "../src/lauxlib.h"
-#include "../src/lualib.h"
-}
+#define LUA_LIB
+#ifndef LUA_COMPAT_MODULE
+#define LUA_COMPAT_MODULE
+#endif
+
+#include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
+
 
 #include <assert.h>
 #include <string.h>
@@ -1261,7 +1264,8 @@ static int Lutf8_gsub(lua_State *L) {
 
 #define UTF8PATT	"[\0-\x7F\xC2-\xF4][\x80-\xBF]*"
 
-luaL_Reg g_lutf8lib[] = {
+LUALIB_API int luaopen_utf8plus(lua_State *L) {
+  luaL_Reg libs[] = {
 #define ENTRY(name) { #name, Lutf8_##name }
     ENTRY(offset),
     ENTRY(codes),
@@ -1290,7 +1294,20 @@ luaL_Reg g_lutf8lib[] = {
     ENTRY(match),
 #undef  ENTRY
     { NULL, NULL }
-};
+  };
+
+#if LUA_VERSION_NUM >= 502
+  luaL_newlib(L, libs);
+#else
+  lua_createtable(L, 0, sizeof(libs)/sizeof(libs[0]));
+  luaL_register(L, "utf8plus", libs);
+#endif
+
+  lua_pushliteral(L, UTF8PATT);
+  lua_setfield(L, -2, "charpattern");
+
+  return 1;
+}
 
 /* win32cc: flags+='-Wall -Wextra -s -O2 -mdll -DLUA_BUILD_AS_DLL'
  * win32cc: libs+='-llua53.dll' output='lua-utf8.dll'

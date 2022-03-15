@@ -1,0 +1,106 @@
+import("msvc.gni")
+
+toolchain("msvc") {
+    lib_switch = ""
+    lib_dir_switch = "/LIBPATH:"
+    sys_lib_flags = string_join(" ", win_msvc_sys_lib_flags)
+
+    # cc = "clang-cl"
+    # cxx = "clang-cl"
+    # linker = "lld-link"
+    cc = "${win_msvc_bin_dir}\\cl.exe"
+    cxx = "${win_msvc_bin_dir}\\cl.exe"
+    linker = "${win_msvc_bin_dir}\\link.exe"
+
+    tool("cc") {
+        # precompiled_header_type = "msvc"
+        pdbname = "{{target_out_dir}}/{{label_name}}_c.pdb"
+        depsformat = "msvc"
+
+        command = "$cc /nologo /Y- /EHa /FC {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}} /c {{source}} /Fo{{output}} /Fd\"$pdbname\""
+
+        outputs = [ "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.obj" ]
+        description = "compile {{source}}"
+    }
+
+    tool("cxx") {
+        # precompiled_header_type = "msvc"
+        pdbname = "{{target_out_dir}}/{{label_name}}_c.pdb"
+        depsformat = "msvc"
+
+        command = "$cxx /nologo /Y- /EHa /FC {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}} /c {{source}} /Fo{{output}} /Fd\"$pdbname\""
+
+        outputs = [ "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.obj" ]
+        description = "compile {{source}}"
+    }
+
+    tool("alink") {
+        default_output_dir = "{{root_out_dir}}" # "{{target_out_dir}}"
+        default_output_extension = ".lib"
+        libname = "{{output_dir}}/{{target_output_name}}{{output_extension}}"
+        outputs = [ libname ]
+        rspfile = "{{output}}.rsp"
+
+        command = "$linker /lib /nologo /ignore:4221 {{arflags}} /OUT:{{output}} @$rspfile"
+
+        rspfile_content = "{{inputs_newline}}"
+        description = "build static library {{output}}"
+    }
+
+    tool("solink") {
+        default_output_dir = "{{root_out_dir}}"
+        default_output_extension = ".dll"
+        dllname = "{{output_dir}}/{{target_output_name}}{{output_extension}}"
+        libname = "${dllname}.lib"
+        pdbname = "${dllname}.pdb"
+        rspfile = "${dllname}.rsp"
+
+        command = "$linker /nologo /IMPLIB:$libname ${sys_lib_flags} /DLL /OUT:$dllname /PDB:$pdbname @$rspfile"
+        outputs = [
+            dllname,
+            libname,
+            pdbname,
+        ]
+
+        link_output = libname
+        depend_output = libname
+        runtime_outputs = [
+            dllname,
+            pdbname,
+        ]
+
+        # Since the above commands only updates the .lib file when it changes, ask
+        # Ninja to check if the timestamp actually changed to know if downstream
+        # dependencies should be recompiled.
+        restat = true
+
+        # inputs_newline works around a fixed per-line buffer size in the linker.
+        rspfile_content = "{{inputs_newline}} {{libs}} {{solibs}} {{ldflags}}"
+        description = "build dynamic library {{output}}"
+    }
+
+    tool("link") {
+        default_output_dir = "{{root_out_dir}}"
+        default_output_extension = ".exe"
+        exename = "{{root_out_dir}}/{{target_output_name}}{{output_extension}}"
+        pdbname = "$exename.pdb"
+        rspfile = "$exename.rsp"
+        outputs = [ exename ]
+
+        command = "$linker /nologo /OUT:$exename ${sys_lib_flags} /PDB:$pdbname @$rspfile"
+
+        # inputs_newline works around a fixed per-line buffer size in the linker.
+        rspfile_content = "{{inputs_newline}} {{libs}} {{solibs}} {{ldflags}}"
+        description = "build executable $exename"
+    }
+
+    tool("stamp") {
+        command = "cmd /c type nul > \"{{output}}\""
+        description = "STAMP {{output}}"
+    }
+
+    tool("copy") {
+        command = "cmd /c python cp.py {{source}} {{output}}"
+        description = "copy {{source}} {{output}}"
+    }
+}

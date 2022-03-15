@@ -1,0 +1,31 @@
+# Copyright 2014 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+import("toolchain/msvc.gni")
+
+config("compiler_defaults") {
+    if (is_linux) {
+        cflags = [
+            "-fPIC",
+            "-pthread",
+        ]
+    }
+    if (is_win) {
+        cflags = [
+            "/bigobj",  # Some of our files are bigger than the regular limits.
+            "/Gy",  # Enable function-level linking.
+            "/FS",  # Preserve previous PDB behavior.
+            "/utf-8",  # Assume UTF-8 by default to avoid code page dependencies.
+        ]
+        include_dirs = win_msvc_inc_dirs
+    }
+}
+
+config("executable_ldconfig") {
+  if (is_linux) {
+    ldflags = [
+      "-Wl,-rpath=\$ORIGIN/",
+      "-Wl,-rpath-link=",
+    ]
+  }
+}

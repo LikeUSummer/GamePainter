@@ -1,0 +1,43 @@
+if (target_os == "") {
+    target_os = host_os
+}
+
+if (target_cpu == "") {
+    target_cpu = host_cpu
+}
+
+if (current_os == "") {
+    current_os = target_os
+}
+
+if (current_cpu == "") {
+    current_cpu = target_cpu
+}
+
+# 这样设置系统标志，表示暂不考虑交叉编译
+is_win = host_os == "win" && current_os == "win" && target_os == "win"
+is_linux = host_os == "linux" && current_os == "linux" && target_os == "linux"
+is_mac = host_os == "mac" && current_os == "mac" && target_os == "mac"
+
+# 给部分目标类型指定默认配置
+_shared_binary_target_configs = [ "//build:compiler_defaults" ]
+
+set_defaults("executable") {
+    configs = _shared_binary_target_configs
+    configs += [ "//build:executable_ldconfig" ] # Executables get this additional configuration.
+}
+
+set_defaults("static_library") {
+    configs = _shared_binary_target_configs
+}
+
+set_defaults("shared_library") {
+    configs = _shared_binary_target_configs
+}
+
+set_defaults("source_set") {
+    configs = _shared_binary_target_configs
+}
+
+# 设置默认编译工具链
+set_default_toolchain("//build/toolchain:msvc")

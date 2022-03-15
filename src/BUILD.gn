@@ -1,0 +1,25 @@
+import("//config.gni")
+
+config("game_painter_config") {
+    libs = [
+        "user32.lib",
+        "gdi32.lib",
+        "gdiplus.lib",
+        "winmm.lib",
+        "Imm32.lib",
+    ]
+    defines = []
+}
+
+executable("GamePainter") {
+    sources = [ "main.cpp" ]
+
+    configs += [ ":game_painter_config" ]
+
+    public_deps = [
+        "lua:lua_wrapper",
+        "utils:utils",
+    ]
+
+    #output_dir = "//test"
+}

@@ -1,0 +1,5 @@
+import("//config.gni")
+
+source_set("utils") {
+    sources = [ "codec.cpp" ]
+}

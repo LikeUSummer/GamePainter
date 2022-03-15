@@ -1,7 +1,0 @@
-[编译 lua 静态库]
-clang -c src/*.c
-lib *.o
-del *.o
-
-[编译测试程序]
-clang++ ../utils/*.cpp *.cpp -o test.exe -L./bin/ -llua_static

@@ -1,0 +1,4 @@
+declare_args() {
+    use_thread_pool = false
+    debug_mode = false
+}

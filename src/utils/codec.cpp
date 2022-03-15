@@ -5,6 +5,8 @@
 #include <locale>
 #include <memory>
 
+#include "codec.h"
+
 /*
 可用“也”字测试各编码转换函数是否正常工作
 Unicode	   UTF-8	  GB18030（ANSI本地码）

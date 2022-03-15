@@ -11,8 +11,6 @@ require("Mumu") -- 野怪阿木木
 require("Map") -- 地图
 require("Board") -- 状态面板
 
--- require("utf8")
-
 function GameInit()
     require("Assets")
     Painter.SetCanvas(WIDTH, HEIGHT)
@@ -31,10 +29,10 @@ function GameInit()
 end
 
 function GameLoop() -- 游戏主循环函数，必须含有
-    -- Painter.DrawSolidRect(0, 0, WIDTH, HEIGHT, 0xFF666666)
     -- Painter.DrawImageByScale(imageID, 0, 0, 1, 1)
+    -- Painter.DrawSolidRect(0, 0, WIDTH, HEIGHT, 0xFF666666)
     -- local text = "你好，世界"
-    -- Painter.DrawString(0, 0, text, 0xFFFFFFFF)
+    -- Painter.DrawString(0, 0, text .. utf8.len(text), 0xFFFFFFFF)
     for k, obj in pairs(world.noumena) do
         obj:Update()
     end
