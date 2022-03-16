@@ -10,8 +10,8 @@
 #include <vector>
 
 #include "win.h"
-#include "lua/lua_machine.h"
-#include "utils/codec.h"
+#include "lua_machine.h"
+#include "codec.h"
 
 #include <gdiplus.h>
 

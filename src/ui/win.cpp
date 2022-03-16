@@ -1,79 +1,22 @@
 // 东方盛夏 2022
 // https://www.zhihu.com/people/da-xia-tian-60
-#ifndef WINDOW_H
-#define WINDOW_H
+#include "win.h"
 
-#ifndef UNICODE
-#define UNICODE // for windows.h
-#endif
-#ifndef _UNICODE
-#define _UNICODE // for tchar.h
-#endif
-
-#include <tchar.h>
-#include <windows.h>
-#include <windowsx.h>
-
-#include <future>
-#include <functional>
-#include <map>
-#include <memory>
-#include <mutex>
-#include <set>
-#include <string>
-#include <sstream>
-
-class Window;
-using MSG_HANDLER = std::function<void (HWND, WPARAM, LPARAM)>;
-void VoidHandler(HWND handle, WPARAM wParam, LPARAM lParam) {}
-
-class Window : public std::enable_shared_from_this<Window> {
-public:
-    static HINSTANCE instance_;
-    static std::wstring defaultWindowClassName_;
-    static std::map<HWND, std::shared_ptr<Window>> windowMap_;
-
-public:
-    HWND handle_ {nullptr};
-    std::wstring className_;
-    std::wstring title_;
-    std::map<UINT, MSG_HANDLER> handlerMap_;
-    HDC bufferDC_ {nullptr}; // 用于双缓冲绘图
-    std::shared_ptr<std::promise<bool>> destroyPromise_;
-
-public:
-    Window();
-    bool Create();
-    bool CreateFromClassName(const std::wstring& className);
-    void CreateFromHandle(HWND handle);
-    void Remove();
-
-    void Show(int mode = SW_SHOWNORMAL);
-    HDC GetBufferDC();
-    void ExchangeBuffer();
-    void UpdateView();
-
-    void SetTitle(const std::wstring& title);
-    void SetPosition(int x, int y, int width, int height);
-
-public:
-    static LRESULT __stdcall OnMessage(HWND handle, UINT message, WPARAM wParam, LPARAM lParam);
-    static bool Initialise(HINSTANCE instance);
-};
 HINSTANCE Window::instance_ {nullptr};
 std::map<HWND, std::shared_ptr<Window>> Window::windowMap_;
 std::wstring Window::defaultWindowClassName_ {_T("GamePainterWindowClass")};
+void VoidHandler(HWND handle, WPARAM wParam, LPARAM lParam) {}
 
 bool Window::Initialise(HINSTANCE instance)
 {
     instance_ = instance;
-    WNDCLASSEX winClass {0}; // 结构体成员清零（必要）
-    winClass.cbSize = sizeof(WNDCLASSEX); // 指明结构体尺寸（WNDCLASSEX 必要，WNDCLASS 不必要）
+    WNDCLASSEX winClass {0}; // 结构体成员清零[必要]
+    winClass.cbSize = sizeof(WNDCLASSEX); // 指明结构体尺寸[WNDCLASSEX 必要，WNDCLASS 不必要]
     winClass.lpfnWndProc = Window::OnMessage;
     winClass.hInstance = instance;
     winClass.lpszClassName = defaultWindowClassName_.c_str(); 
-    // winClass.hbrBackground =  (HBRUSH)(COLOR_WINDOW + 1); // CreateSolidBrush((COLORREF)rand());
-    // winClass.style = CS_HREDRAW | CS_VREDRAW; // 自动重绘背景
+    winClass.style = CS_HREDRAW | CS_VREDRAW; // 自动重绘背景
+    winClass.hbrBackground =  (HBRUSH)(COLOR_WINDOW + 1); // CreateSolidBrush((COLORREF)rand());
     // winClass.cbClsExtra = 0; // 窗口类的附加内存
     // winClass.cbWndExtra = 0; // 窗口的附加内存
     // winClass.hIcon = LoadIcon(instance_, MAKEINTRESOURCE(IDI_APPLICATION));
@@ -88,7 +31,7 @@ bool Window::Initialise(HINSTANCE instance)
 
 Window::Window()
 {
-    // 注册占位消息
+    // 注册占位消息，框架需要对它们做额外的响应处理
     handlerMap_[WM_DESTROY] = VoidHandler;
 }
 
@@ -104,7 +47,7 @@ bool Window::Create()
 bool Window::CreateFromClassName(const std::wstring& className) // 若需要使用系统控件，可传入系统预设窗口类名
 {
     if (windowMap_.count(handle_)) {
-        Remove();
+        Remove(); // 关闭和移除当前管理的窗口
     }
     className_ = className;
     handle_ = CreateWindow(
@@ -114,10 +57,11 @@ bool Window::CreateFromClassName(const std::wstring& className) // 若需要使�
         CW_USEDEFAULT, 0, CW_USEDEFAULT, 0,
         NULL, NULL,
         instance_, NULL
-    ); // CreateWindow 执行过程中就要发送和处理完 WM_CREATE 消息，这样本框架就不能正常处理它
+    ); // CreateWindow 执行过程中会发送 WM_CREATE 消息并等待它处理完，这样本框架就捕获不到 WM_CREATE
 
     windowMap_.insert({handle_, shared_from_this()});
-    SendMessage(handle_, WM_CREATE, 0 , 0); // 因此我们在窗口表初始化后，重发一次 WM_CREATE 消息，此时请忽略消息参数
+    // 因此我们在 windowMap_ 赋值后，重发一次 WM_CREATE 消息，此时请忽略消息参数
+    SendMessage(handle_, WM_CREATE, 0 , 0);
     return true;
 }
 
@@ -127,11 +71,11 @@ void Window::CreateFromHandle(HWND handle)
         Remove();
     }
     constexpr int BUFFER_SIZE = 256;
-    std::vector<TCHAR> className(BUFFER_SIZE, 0);
-    GetClassName(handle, className.data(), BUFFER_SIZE);
-    className_ = className.data();
-    GetWindowText(handle, className.data(), BUFFER_SIZE);
-    title_ = className.data();
+    std::vector<TCHAR> text(BUFFER_SIZE, 0);
+    GetClassName(handle, text.data(), BUFFER_SIZE);
+    className_ = text.data();
+    GetWindowText(handle, text.data(), BUFFER_SIZE);
+    title_ = text.data();
 
     handle_ = handle;
     windowMap_.insert({handle_, shared_from_this()});
@@ -147,7 +91,7 @@ void Window::SetTitle(const std::wstring& title)
 
 void Window::SetPosition(int x, int y, int width, int height)
 {
-    SetWindowPos(handle_, NULL, x, y, width, height, SWP_NOMOVE);
+    SetWindowPos(handle_, NULL, x, y, width, height, SWP_SHOWWINDOW);
     UpdateView();
 }
 
@@ -165,6 +109,13 @@ void Window::Show(int mode)
     UpdateWindow(handle_);
 }
 
+RECT Window::GetRect()
+{
+    RECT rect;
+    GetWindowRect(handle_, &rect);
+    return rect;
+}
+
 HDC Window::GetBufferDC()
 {
     if (!bufferDC_) {
@@ -174,8 +125,6 @@ HDC Window::GetBufferDC()
         int height = GetSystemMetrics(SM_CYFULLSCREEN);
         HBITMAP bitmap = CreateCompatibleBitmap(hdc, width, height);
         SelectObject(bufferDC_, bitmap);
-        // RECT rect {0, 0, width, height};
-        // FillRect(bufferDC_, &rect, CreateSolidBrush(RGB(255,200,50)));
         SetBkMode(bufferDC_, TRANSPARENT);
         ReleaseDC(handle_, hdc);
     }
@@ -194,23 +143,22 @@ void Window::ExchangeBuffer()
 
 void Window::Remove()
 {
-    destroyPromise_ = std::make_shared<std::promise<bool>>();
+    destroyPromise_ = std::make_unique<std::promise<bool>>();
+    std::future<bool> destroyFuture = destroyPromise_->get_future();
     DestroyWindow(handle_);
-    destroyPromise_->get_future().wait(); // 等待窗口销毁回调处理完，否则可能导致用户资源泄漏
+    destroyFuture.wait(); // 等待窗口销毁回调处理完，否则可能导致用户资源泄漏
+    destroyPromise_ = nullptr;
     windowMap_.erase(handle_);
 }
 
 LRESULT Window::OnMessage(HWND handle, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    if (windowMap_.count(handle)) {
-        if (windowMap_[handle]->handlerMap_.count(message)) {
-            windowMap_[handle]->handlerMap_[message](handle, wParam, lParam);
-            if (message == WM_DESTROY) {
-                windowMap_[handle]->destroyPromise_->set_value(true);
-            }
-            return 0;
+    if (windowMap_.count(handle) && windowMap_[handle]->handlerMap_.count(message)) {
+        windowMap_[handle]->handlerMap_[message](handle, wParam, lParam);
+        if (message == WM_DESTROY && windowMap_[handle]->destroyPromise_) {
+            windowMap_[handle]->destroyPromise_->set_value(true);
         }
+        return 0;
     }
     return DefWindowProc(handle, message, wParam, lParam);
 }
-#endif

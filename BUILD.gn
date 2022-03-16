@@ -4,6 +4,7 @@ group("test_bin") {
     deps = [
         "//src:GamePainter",
         "//src/lua:lua_wrapper_test",
+        "//src/ui:test_windows_wrapper",
         # "//src/lua/ext:utf8plus",
         #"//src/lua/src:lua_static"
     ]

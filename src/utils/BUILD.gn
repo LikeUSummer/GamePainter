@@ -1,5 +1,6 @@
 import("//config.gni")
 
 source_set("utils") {
+    include_dirs = [ "./" ]
     sources = [ "codec.cpp" ]
 }
