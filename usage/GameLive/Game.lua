@@ -13,6 +13,7 @@ require("Board") -- 状态面板
 
 function GameInit()
     require("Assets")
+    Painter.SetClock(100)
     Painter.SetCanvas(WIDTH, HEIGHT)
     Painter.SetFont("宋体", 12)
 

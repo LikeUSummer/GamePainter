@@ -295,8 +295,8 @@ int SetIMEPosition(lua_State* L)
 int SetClock(lua_State* L)
 {
     int dt = lua_tointeger(L, 1);
-    KillTimer(g_window->handle_, 666);
-    SetTimer(g_window->handle_, 666, dt, 0);
+    KillTimer(g_window->handle_, GAME_LOOP_TIMER_ID);
+    SetTimer(g_window->handle_, GAME_LOOP_TIMER_ID, dt, NULL);
     return 0;
 }
 
@@ -365,6 +365,7 @@ const luaL_Reg g_gameLib[] = {
 
 void OnCreate(HWND handle, WPARAM wParam, LPARAM lParam)
 {
+    SetTimer(handle, GAME_LOOP_TIMER_ID, GAME_LOOP_TIMER_PERIOD, NULL);
     // 初始化 Lua 脚本
     std::string scriptPath;
     LuaMachine machine;
@@ -382,7 +383,6 @@ void OnCreate(HWND handle, WPARAM wParam, LPARAM lParam)
         exit(1);
     }
     g_luaMachine.Call("GameInit");
-    SetTimer(handle, GAME_LOOP_TIMER_ID, GAME_LOOP_TIMER_PERIOD, NULL);
 }
 
 // 消息处理
