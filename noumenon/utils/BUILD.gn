@@ -1,0 +1,10 @@
+import("//config.gni")
+
+config("utils_config") {
+    include_dirs = [ "./" ]
+}
+
+source_set("utils") {
+    sources = [ "codec.cpp" ]
+    public_configs = [ ":utils_config" ]
+}

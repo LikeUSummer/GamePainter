@@ -1,6 +1,11 @@
 import("//config.gni")
 
+config("windows_wrapper_config") {
+    include_dirs = [ "./" ]
+}
+
 source_set("windows_wrapper") {
+    public_configs = [ ":windows_wrapper_config" ]
     libs = [
         "user32.lib",
         "gdi32.lib",

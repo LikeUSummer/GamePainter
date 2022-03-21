@@ -1,11 +1,11 @@
 import("config.gni")
 
-group("test_bin") {
+group("usage") {
     deps = [
-        "//src:GamePainter",
-        "//src/lua:lua_wrapper_test",
-        "//src/ui:test_windows_wrapper",
-        # "//src/lua/ext:utf8plus",
-        #"//src/lua/src:lua_static"
+        "//noumenon:GamePainter",
+        "//noumenon/lua:lua_wrapper_test",
+        "//noumenon/ui:test_windows_wrapper",
+        # "//noumenon/lua/ext:utf8plus",
+        # "//noumenon/lua/src:lua_static"
     ]
 }

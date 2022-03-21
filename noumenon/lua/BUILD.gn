@@ -1,15 +1,19 @@
 import("//config.gni")
 
+config("lua_wrapper_config") {
+    include_dirs = [ "./" ]
+}
+
 source_set("lua_wrapper") {
+    public_configs = [ ":lua_wrapper_config" ]
     sources = [ "lua_machine.cpp" ]
     public_deps = [ "src:lua" ]
 }
 
 executable("lua_wrapper_test") {
-    include_dirs = [ "//src/utils" ]
     sources = [ "test_lua_wrapper.cpp" ]
-    deps = [
+    public_deps = [
         ":lua_wrapper",
-        "//src/utils:utils",
+        "../utils:utils",
     ]
 }

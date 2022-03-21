@@ -37,6 +37,7 @@ c_files = [
 ]
 
 config("lua_config") {
+    include_dirs = [ "./" ]
     defines = [ "LUA_COMPAT_MODULE" ]
 }
 
