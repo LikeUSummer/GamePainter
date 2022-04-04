@@ -1,8 +1,8 @@
 ## 效果图
 
-![](./usage/效果图1.png)
+![](usage/效果图1.jpg)
 
-![](usage/效果图2.png)
+![](usage/效果图2.jpg)
 
 ## 编译构建
 
