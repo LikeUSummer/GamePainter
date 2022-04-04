@@ -17,20 +17,20 @@
 
 std::shared_ptr<Window> g_window;
 LuaMachine g_luaMachine;
+ULONG_PTR g_GDIPlusToken {0};
 std::map<uint32_t, std::unique_ptr<Gdiplus::Image>> g_imageMap;
 std::unique_ptr<Gdiplus::Font> g_font;
 std::unique_ptr<Gdiplus::Pen> g_pen;
 HCURSOR g_cursor;
-constexpr int GAME_LOOP_TIMER_ID = 960103;
-constexpr int GAME_LOOP_TIMER_PERIOD = 100; // ms
+constexpr int GAME_LOOP_TIMER_ID {960103};
+constexpr int GAME_LOOP_TIMER_PERIOD {100}; // ms
 
 struct Initialiser {
     Initialiser()
     {
         // 初始化 GDI+
-        ULONG_PTR g_GDIPlusToken;
-        Gdiplus::GdiplusStartupInput g_GDIStartupInput;
-        GdiplusStartup(&g_GDIPlusToken,&g_GDIStartupInput, NULL);
+        Gdiplus::GdiplusStartupInput startupInput;
+        Gdiplus::GdiplusStartup(&g_GDIPlusToken, &startupInput, NULL);
 
         g_pen = std::make_unique<Gdiplus::Pen>(Gdiplus::Color::Black, 1.5f);
         Gdiplus::FontFamily fontFamily(_T("宋体"));
@@ -460,6 +460,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPreInst, LPSTR lpCmd, int nShowMo
         PostQuitMessage(0);
     };
     g_window->handlerMap_[WM_QUIT] = [](HWND handle, WPARAM wParam, LPARAM lParam) {
+        Gdiplus::GdiplusShutdown(g_GDIPlusToken);
         KillTimer(handle, GAME_LOOP_TIMER_ID);
     };
 
