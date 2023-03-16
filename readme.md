@@ -39,7 +39,7 @@ cd noumenon
 clang++ main.cpp ui/win.cpp lua/lua_machine.cpp utils/*.cpp -o GamePainter.exe -Iui -Ilua -Iutils -Llua/bin -llua_static -luser32 -lgdi32 -lgdiplus -lwinmm -lImm32
 ```
 
-注：如果引用了第三方使用 VC 编译出的库，为避免 VC 运行时库的冲突（无法解析符号等），可在上述编译命令后追加 `-lmsvcrt -llibcmt`
+如果您需要使用其他基于 MSVC 构建的三方库，请改用 `clang-cl` 编译，并添加恰当的 `/MT` 或 `/MD` 选项，可避免 MSVC 运行时库相关冲突（如出现未解析符号告警）。
 
 ## 效果图
 
